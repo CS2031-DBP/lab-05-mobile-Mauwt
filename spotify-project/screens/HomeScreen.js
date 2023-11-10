@@ -2,7 +2,6 @@ import { ImageBackground, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Button, TextInput } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons } from '@expo/vector-icons';
 import { search } from '../api/SpotifyApi';
 import { useNavigation } from "@react-navigation/native";
 
@@ -51,7 +50,7 @@ function HomeScreen() {
             }
         }
         );
-        //console.log(JSON.stringify(data))
+        
         if (data.length === 0) {
             alert('No se encontraron resultados');
             setSearchEnabled(false);

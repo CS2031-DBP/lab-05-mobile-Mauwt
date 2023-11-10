@@ -15,8 +15,6 @@ const app_credentials = {
 const LoginScreen = () => {
 	const navigation = useNavigation();
 
-	const img = { uri: "../assets/icon.splash.png"}
-
 	const authOptions = {
 		url: 'https://accounts.spotify.com/api/token',
 		headers: {

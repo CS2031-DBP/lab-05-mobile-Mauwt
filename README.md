@@ -80,13 +80,78 @@ yarn expo start
 - Debe validar utilizando un cliente como *Postman* o *Thunder* que el `API` seleccionado funciona correctamente.
 - Es posible que el servicio tenga un `API_KEY`. De ser así, cree una cuenta en la plataforma, genere su llave y utilícela tal y como se indique en la documentación del servicio seleccionado.
 
-#### 3. Editar está sección del `README.md` con una descripción del sistema y los principales casos de uso. **Elimine los ejemplos presentados a continuación y coloqué los suyos.**
-- `Descripción del sistema:` Aplicación en línea diseñada para facilitar la planificación y reserva de viajes aéreos para usuarios individuales y empresas...
+#### 3. Editar está sección del `README.md` con una descripción del sistema y los principales casos de uso. 
 
-- `Casos de uso del sistema:` 
-  - **Crear una reserva:** Un usuario puede crear una nueva reserva de vuelo proporcionando detalles como origen, destino, fecha y número de pasajeros.
-  - **Cancelar una reserva:** Un usuario puede cancelar una reserva existente ingresando el número de reserva.
-  - **Modificar una reserva:** Un usuario puede modificar una reserva existente, cambiando la fecha, la ruta o el número de pasajeros.
+- Descripición del sistema:
+  - `API seleccionada`: [Spotify API](https://developer.spotify.com/documentation/web-api/)
+  - `ENDPINT`: [**GET** /v1/search](https://developer.spotify.com/documentation/web-api/reference/search)
+  - `Sensor usado`: [Audio](https://docs.expo.dev/versions/latest/sdk/audio/)
+
+Para tener acceso a los enpoints de spotify se usó la autorización [Credential Flow](https://developer.spotify.com/documentation/web-api/tutorials/client-credentials-flow) que es básicamente un JWT que se envía en el header de la petición. Revisar el archivo [LoginScreen.js](./spotify-project/screens/LoginScreen.js) para ver como se hace la petición.
+
+La aplicación tiene como punto principal hacer un juego de trivia de tu artista o genero favorito. Para esto se hace una petición a la API de spotify para obtener una lista de canciones de un artista o genero, según seleccione el usuario, revisar el archivo [SpotifyApi.js](./spotify-project/api/SpotifyApi.js). Del `response`, cuyo formato se puede revisar [aquí](https://developer.spotify.com/documentation/web-api/reference/search), se extrae la siguiente información de cada canción en `tracks.items`:
+``` json
+{
+  img: track.album.images[1].url,
+  spotify_url: track.external_urls.spotify,
+  name: track.name,
+  artist: track.artists[0].name,
+  preview_url: track.preview_url,
+  uri: track.uri,
+}
+```
+Luego se selecciona una canción al azar y se reproduce un fragmento de la canción usando el atributo `preview_url`. El usuario debe adivinar el nombre de la canción. Si el usuario adivina correctamente se le hace saber atraves del cambio de colores de la interfaz, al igual si es que falla, la respuesta correcta se muestra en ambos casos y se abilita el botón para una cambiar la canción a adivinar.
+
+`Frontend`
+- Se hizo uso de los componentes de React Native, React Native Paper, los iconos de expo-vector-icons.
+
+`AsyncStorage`
+- Se guardó el token de autenticación usando AsyncStorage, revisar el `useEffect` en el archivo [HomeScreen](./spotify-project/screens/HomeScreen.js).
+
+`Audio`	
+- Se usó [expo-av](https://docs.expo.dev/versions/latest/sdk/av/) para reproducir el fragmento de la canción, revisar el archivo [AudioPlayer.js](./spotify-project/screens/Player.js) 
+  
+  La función `onClickNewTrack` se llama cuando se selecciona una nueva pista. Primero comprueba si la pista actual está cargada y, si lo está, pausa la pista actual. Luego establece la pista actual a un nuevo objeto `Audio.Sound` y llama a la función `pickRandomTrack` para seleccionar una nueva pista. También restablece `guess` y `answer`.
+  
+  La función `onPlaybackStatusUpdate` se ejecuta cada vez que cambia el estado de reproducción de la pista actual. Si la pista acaba de terminar de reproducirse (`didJustFinished`), establece `isPlaying` a false, `finished` a true, y `currentTrack` a un nuevo objeto `Audio.Sound`.
+  
+  La función `play` se utiliza para controlar la reproducción de la pista actual. Si la pista se está reproduciendo, la pausa. Si la pista no se está reproduciendo y está cargada, comienza a reproducirla. Si la pista no se está reproduciendo y no está cargada, establece el modo de audio, crea un nuevo objeto Audio.Sound con la URL de la pista aleatoria y comienza a reproducir la pista.
+
+`Screens`
+
+- `LoginScreen`
+
+<div style="heigth: 100px">
+  <img src="./img/login.png" alt="Login Screen" width="150"  style="margin-left:50px"/>
+</div>
+
+- `HomeScreen`
+  
+<div style="heigth: 100px">
+  <img src="./img/home.png" alt="Home Screen" width="150"  style="margin-left:50px"/>
+</div>
+
+- `PlayerScreen`	
+
+<div style="heigth: 100px">
+  <img src="./img/main.png" alt="Player Screen" width="150"  style="margin-left:50px"/>
+</div>
+
+- `PlayerScreen` con respuesta correcta
+
+<div style="heigth: 100px">
+  <img src="./img/correct.png" alt="Player Screen" width="150"  style="margin-left:50px"/>
+</div>
+
+
+- `PlayerScreen` con respuesta incorrecta
+
+<div style="heigth: 100px">
+  <img src="./img/error.png" alt="Player Screen" width="150"  style="margin-left:50px"/>
+</div>
+
+
+
 
 #### 4. Desarrolle una interfaz móvil 
 > Desarrolle una interfaz móvil que contemple todos los casos de uso descritos y cumpla con los siguientes requisitos:
